@@ -38,10 +38,8 @@ def merge():
         messagebox.showerror(title='Error', message='Please add a the output path of merged table!')
 
     #Create the merged csv file and remove the duplications
-    path = CSCS_PATH
-    all_files = os.listdir(CSCS_PATH)
-
     csv_lst = []
+    all_files = os.listdir(CSCS_PATH)
 
     for filename in all_files:
         if not filename.endswith(".txt"):
