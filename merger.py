@@ -1,5 +1,4 @@
 import os
-import glob
 from tkinter import *
 import pandas as pd
 from tkinter import messagebox,filedialog,Entry
@@ -8,16 +7,12 @@ from tkinter import messagebox,filedialog,Entry
 YELLOW = "#f7f5dd"
 GREEN = "#9bdeac"
 FONT_NAME = "Courier"
-MAX_LENGTH = 0 #TODO depricated , kill it
-FILE_PATH = None #TODO depricated , kill it
 OUTPUT_PATH = None 
 OUTPUT_NAME = None
 CSCS_PATH = None
 DOMAIN_COLUMN = None
 DR_COLUMN = None 
-CONTACTES_SITES = None
-
-
+CONTACTED_SITES = None
 
 # ---------------------------- DIVIDE MECHANISM ------------------------------- # 
 def write_to_file(filename,rows):
@@ -29,40 +24,45 @@ def merge():
     global MAX_LENGTH
     
     #Handle errors
-    # if CSCS_PATH is None: #TODO decomment all of error checks
-    #     messagebox.showerror(title='Error', message='Please add the path of csv\'s folder!')
-    # elif DOMAIN_COLUMN is None:
-    #     messagebox.showerror(title='Error', message='Please add the name of the domain column!')
-    # elif DR_COLUMN is None:
-    #     messagebox.showerror(title='Error', message='Please add the name of the DR column!')
-    # elif CONTACTES_SITES is None:
-    #     messagebox.showerror(title='Error', message='Please add the path of the contactes site\'s table!')
-    # elif OUTPUT_NAME is None:
-    #     messagebox.showerror(title='Error', message='Please add a the name of the output file of merged table!')
-    # elif OUTPUT_PATH is None:
-    #     messagebox.showerror(title='Error', message='Please add a the output path of merged table!')
+    if CSCS_PATH is None:
+        messagebox.showerror(title='Error', message='Please add the path of csv\'s folder!')
+    elif DOMAIN_COLUMN is None:
+        messagebox.showerror(title='Error', message='Please add the name of the domain column!')
+    elif DR_COLUMN is None:
+        messagebox.showerror(title='Error', message='Please add the name of the DR column!')
+    elif CONTACTED_SITES is None:
+        messagebox.showerror(title='Error', message='Please add the path of the contactes site\'s table!')
+    elif OUTPUT_NAME is None:
+        messagebox.showerror(title='Error', message='Please add a the name of the output file of merged table!')
+    elif OUTPUT_PATH is None:
+        messagebox.showerror(title='Error', message='Please add a the output path of merged table!')
 
     #Create the merged csv file and remove the duplications
     path = CSCS_PATH
     all_files = os.listdir(CSCS_PATH)
 
-    li = []
+    csv_lst = []
 
     for filename in all_files:
         if not filename.endswith(".txt"):
             df = pd.read_csv(CSCS_PATH + '/' + filename, index_col=None, header=0)
-            li.append(df)
+            csv_lst.append(df)
 
-    merged_frame = pd.concat(li, axis=0, ignore_index=True).drop_duplicates()
+    merged_frame = pd.concat(csv_lst, axis=0, ignore_index=True).drop_duplicates()
   
     #Remove the unneeded columns
     for column_name in merged_frame.columns.values.tolist():
         if DOMAIN_COLUMN.strip().lower() != column_name.lower() \
            and DR_COLUMN.strip().lower() != column_name.lower():
             del merged_frame[column_name]
+    
+    #Compare with the contacted site's list and remove the sited urls
+    csf = pd.read_excel(CONTACTED_SITES)
+    for url in csf.values.flatten().tolist():
+        merged_frame = merged_frame[merged_frame['Referring Domain'] != url]
 
+    #Create the output file
     merged_frame.to_csv(OUTPUT_PATH + '/' + OUTPUT_NAME +'.csv',index=False)
-
 
 def select_dir():
     global CSCS_PATH
@@ -71,11 +71,11 @@ def select_dir():
     CSCS_PATH = dir   
 
 def set_contacted_site():
-    global CONTACTES_SITES
-    f_types = [('Tables', '*.xlsx *.csv')]
+    global CONTACTED_SITES
+    f_types = [('Tables', '*.xlsx')]
     filename = filedialog.askopenfile(filetypes=f_types)
     contacted_sites.insert(0, filename.name)
-    CONTACTES_SITES = filename.name     
+    CONTACTED_SITES = filename.name     
 
 def set_output_path():
     global OUTPUT_PATH
