@@ -11,7 +11,9 @@ OUTPUT_PATH = None
 OUTPUT_NAME = None
 CSCS_PATH = None
 DOMAIN_COLUMN = None
+DOMAIN_COLUMN_DEF_NAME = 'Referring Domain'
 DR_COLUMN = None 
+DR_COLUMN_DEF_NAME = 'Domain Rating'
 CONTACTED_SITES = None
 
 # ---------------------------- DIVIDE MECHANISM ------------------------------- # 
@@ -40,18 +42,28 @@ def merge():
     #Create the merged csv file and remove the duplications
     csv_lst = []
     all_files = os.listdir(CSCS_PATH)
-
+    
     for filename in all_files:
-        if not filename.endswith(".txt"):
+        if filename.endswith(".csv"):
             df = pd.read_csv(CSCS_PATH + '/' + filename, index_col=None, header=0)
+            
+            #Check the custom columns name based on the api
+            for dcname in DOMAIN_COLUMN:
+                if dcname.strip() in list(df):
+                    df.rename(columns = {dcname.strip():DOMAIN_COLUMN_DEF_NAME}, inplace = True) 
+            
+            for drname in DR_COLUMN:
+                if drname.strip() in list(df):  
+                    df.rename(columns = {drname.strip():DR_COLUMN_DEF_NAME}, inplace = True) 
+            
             csv_lst.append(df)
 
     merged_frame = pd.concat(csv_lst, axis=0, ignore_index=True).drop_duplicates()
-  
+    
     #Remove the unneeded columns
     for column_name in merged_frame.columns.values.tolist():
-        if DOMAIN_COLUMN.strip().lower() != column_name.lower() \
-           and DR_COLUMN.strip().lower() != column_name.lower():
+        if DOMAIN_COLUMN_DEF_NAME.strip().lower() != column_name.lower() \
+           and DR_COLUMN_DEF_NAME.strip().lower() != column_name.lower():
             del merged_frame[column_name]
     
     #Compare with the contacted site's list and remove the sited urls
@@ -85,7 +97,7 @@ def select_domain_header():
     global DOMAIN_COLUMN
     value = domain_header.get()
     try:
-        DOMAIN_COLUMN = str(value)
+        DOMAIN_COLUMN = str(value).split(';')
 
         if DOMAIN_COLUMN == '':
             messagebox.showerror(title='Error', message='Please add the name of the domain header!')    
@@ -97,7 +109,7 @@ def select_dr_header():
     global DR_COLUMN
     value = dr_header.get()
     try:
-        DR_COLUMN = str(value)
+        DR_COLUMN = str(value).split(';')
 
         if DR_COLUMN == '':
             messagebox.showerror(title='Error', message='Please add the name of the DR header!')    
