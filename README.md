@@ -1,4 +1,4 @@
-![Screenshot from 2023-04-01 17-56-43](https://user-images.githubusercontent.com/47550032/229301599-92db89e7-7ef7-4fd7-9da5-a74e5aa009f9.png)
+![Screenshot from 2023-04-03 17-20-28](https://user-images.githubusercontent.com/47550032/229555238-bbbef0dc-5645-4f35-ba9f-d90e83bfc989.png)
 
 # Description
 Simple tkinter based desktop app to concat (without any duplication) every csv file in the selected folde. The merged csv will be compared with the list of contacted sites and the visited urls will be deleted from the csv database
@@ -7,14 +7,13 @@ Simple tkinter based desktop app to concat (without any duplication) every csv f
 * Open a terminal in the project and start the application with the merger.py file
 * Add the following details in the application
     * ***Csvs Path*** - *The folder which contains your csv files*
-    * ***Domain Header*** - *The column name of the URL's column name in the csvs*
-    * ***DR Header*** - *The column name of the Domain Rating's cloumn name in the csvs*
+    * ***Domain Header*** - *The column name of the possible URL's column name in the csvs. Note use ; for separate the values*
+    * ***DR Header*** - *The column name of the possible Domain Rating's cloumn name in the csvs. Note use ; for separate the values*
     * ***Contacted Sites*** - *Excel sheet with the urls of the contacted sites*
     * ***Output Filename*** - *The name of the output file (without extensions)*
     * ***Output Path*** - *The path of the output file*
 
 * Click to **Get my list!** button and check your merged and refactored csv file in the output folder
-
 
 # System requirements
 * Python 3.7 or greater is installed on the machine
