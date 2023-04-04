@@ -67,9 +67,14 @@ def merge():
             del merged_frame[column_name]
     
     #Compare with the contacted site's list and remove the sited urls
-    csf = pd.read_excel(CONTACTED_SITES)
-    for url in csf.values.flatten().tolist():
-        merged_frame = merged_frame[merged_frame['Referring Domain'] != url]
+    if CONTACTED_SITES.endswith(".xlsx"):
+        csf = pd.read_excel(CONTACTED_SITES)
+        for url in csf.values.flatten().tolist():
+            merged_frame = merged_frame[merged_frame['Referring Domain'] != url.strip()]
+    elif CONTACTED_SITES.endswith(".txt"):
+        with open(CONTACTED_SITES,'r') as file:
+            for line in file.readlines():
+                merged_frame = merged_frame[merged_frame['Referring Domain'] != line.strip()]
 
     #Create the output file
     merged_frame.to_csv(OUTPUT_PATH + '/' + OUTPUT_NAME +'.csv',index=False)
@@ -82,7 +87,7 @@ def select_dir():
 
 def set_contacted_site():
     global CONTACTED_SITES
-    f_types = [('Tables', '*.xlsx')]
+    f_types = [('Tables', '*.xlsx *.txt')]
     filename = filedialog.askopenfile(filetypes=f_types)
     contacted_sites.insert(0, filename.name)
     CONTACTED_SITES = filename.name     
